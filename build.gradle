@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group 'io.github.jroy'
+
+repositories {
+    mavenCentral()
+    maven { url "https://papermc.io/repo/repository/maven-public/" }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+    compileOnly "com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT"
+    compile 'fr.minuskube.inv:smart-invs:1.2.7'
+}
