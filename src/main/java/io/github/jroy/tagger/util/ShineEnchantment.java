@@ -5,10 +5,10 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemStack;
 
-public class GlowEnchantment extends EnchantmentWrapper {
+public class ShineEnchantment extends EnchantmentWrapper {
 
-  public GlowEnchantment() {
-    super("tagglow");
+  public ShineEnchantment() {
+    super("shine");
   }
 
   @Override

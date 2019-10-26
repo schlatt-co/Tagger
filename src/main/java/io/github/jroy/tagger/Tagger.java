@@ -3,7 +3,7 @@ package io.github.jroy.tagger;
 import fr.minuskube.inv.InventoryManager;
 import io.github.jroy.tagger.command.TagCommand;
 import io.github.jroy.tagger.sql.DatabaseManager;
-import io.github.jroy.tagger.util.GlowEnchantment;
+import io.github.jroy.tagger.util.ShineEnchantment;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
@@ -29,13 +29,13 @@ public class Tagger extends JavaPlugin {
     getLogger().info("Loaded Config!");
     getLogger().info("Loading DatabaseManager...");
     getLogger().info("Registering Glow Enchantment...");
-    GlowEnchantment glowEnchantment;
+    ShineEnchantment shineEnchantment;
     try {
       Field acceptingNew = Enchantment.class.getDeclaredField("acceptingNew");
       acceptingNew.setAccessible(true);
       acceptingNew.set(null, true);
-      glowEnchantment = new GlowEnchantment();
-      EnchantmentWrapper.registerEnchantment(glowEnchantment);
+      shineEnchantment = new ShineEnchantment();
+      EnchantmentWrapper.registerEnchantment(shineEnchantment);
     } catch (Exception e) {
       getLogger().info("Error while registering glow enchantment, disabling...");
       e.printStackTrace();
@@ -44,7 +44,7 @@ public class Tagger extends JavaPlugin {
     }
     DatabaseManager databaseManager;
     try {
-      databaseManager = new DatabaseManager(this, glowEnchantment);
+      databaseManager = new DatabaseManager(this, shineEnchantment);
     } catch (ClassNotFoundException | SQLException e) {
       getLogger().severe("Error while initializing DatabaseManager, disabling...");
       e.printStackTrace();

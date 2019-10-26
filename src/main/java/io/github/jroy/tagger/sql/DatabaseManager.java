@@ -1,7 +1,7 @@
 package io.github.jroy.tagger.sql;
 
 import io.github.jroy.tagger.events.TaggerTagUpdateEvent;
-import io.github.jroy.tagger.util.GlowEnchantment;
+import io.github.jroy.tagger.util.ShineEnchantment;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -22,7 +22,7 @@ public class DatabaseManager implements Listener {
   private static final Tag noneTag = new Tag(1, "none", 0, "");
 
   @Getter
-  private static GlowEnchantment glowEnchantment;
+  private static ShineEnchantment shineEnchantment;
 
   private Connection connection;
 
@@ -33,8 +33,8 @@ public class DatabaseManager implements Listener {
   @Getter
   private HashMap<UUID, List<Tag>> ownedTags = new HashMap<>();
 
-  public DatabaseManager(JavaPlugin plugin, GlowEnchantment glowEnchantment) throws ClassNotFoundException, SQLException {
-    DatabaseManager.glowEnchantment = glowEnchantment;
+  public DatabaseManager(JavaPlugin plugin, ShineEnchantment shineEnchantment) throws ClassNotFoundException, SQLException {
+    DatabaseManager.shineEnchantment = shineEnchantment;
     plugin.getLogger().info("Connecting to database...");
     synchronized (this) {
       Class.forName("com.mysql.cj.jdbc.Driver");

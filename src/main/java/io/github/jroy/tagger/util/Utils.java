@@ -31,7 +31,7 @@ public class Utils {
     }
     itemMeta.setLore(lores);
     if (shine) {
-      itemMeta.addEnchant(DatabaseManager.getGlowEnchantment(), 1, true);
+      itemMeta.addEnchant(DatabaseManager.getShineEnchantment(), 1, true);
     }
     itemStack.setItemMeta(itemMeta);
     return itemStack;
