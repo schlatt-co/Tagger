@@ -3,7 +3,7 @@ author: JRoy
 version: 1.0
 api-version: 1.14
 main: io.github.jroy.tagger.Tagger
-depend: [Stonks, Vault, Punish]
+depend: [Stonks, Vault]
 commands:
   tags:
     description: Main command for Tag plugin

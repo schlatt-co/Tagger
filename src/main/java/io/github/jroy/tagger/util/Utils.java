@@ -1,8 +1,9 @@
 package io.github.jroy.tagger.util;
 
-import io.github.jroy.tagger.sql.DatabaseManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -30,8 +31,9 @@ public class Utils {
       lores.add(ChatColor.translateAlternateColorCodes('&', curLore));
     }
     itemMeta.setLore(lores);
-    if (shine) {
-      itemMeta.addEnchant(DatabaseManager.getShineEnchantment(), 1, true);
+    Enchantment enchantment = EnchantmentWrapper.getByName("shine");
+    if (shine && enchantment != null) {
+      itemMeta.addEnchant(enchantment, 1, true);
     }
     itemStack.setItemMeta(itemMeta);
     return itemStack;

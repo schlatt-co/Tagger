@@ -28,7 +28,7 @@ public class Tagger extends JavaPlugin {
     getLogger().info("Registering Glow Enchantment...");
     DatabaseManager databaseManager;
     try {
-      databaseManager = new DatabaseManager(this, EnchantmentWrapper.getByName("shine"));
+      databaseManager = new DatabaseManager(this);
     } catch (ClassNotFoundException | SQLException e) {
       getLogger().severe("Error while initializing DatabaseManager, disabling...");
       e.printStackTrace();
