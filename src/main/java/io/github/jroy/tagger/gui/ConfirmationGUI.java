@@ -47,7 +47,7 @@ public class ConfirmationGUI implements InventoryProvider {
         }));
 
     if (info.size() > 0) {
-      contents.set(0, 4, ClickableItem.empty(Utils.item(Material.PAPER, "&c&lWarning!", false, info)));
+      contents.set(0, 4, ClickableItem.empty(Utils.item(Material.PAPER, "&c&lWarning!", info)));
     }
   }
 

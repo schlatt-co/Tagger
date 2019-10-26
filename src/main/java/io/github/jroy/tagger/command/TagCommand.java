@@ -5,9 +5,11 @@ import fr.minuskube.inv.SmartInventory;
 import io.github.jroy.tagger.gui.TagSelectorGUI;
 import io.github.jroy.tagger.gui.TagShopGUI;
 import io.github.jroy.tagger.sql.DatabaseManager;
+import io.github.jroy.tagger.sql.Tag;
 import io.github.jroy.tagger.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class TagCommand implements CommandExecutor, TabCompleter {
@@ -89,6 +92,84 @@ public class TagCommand implements CommandExecutor, TabCompleter {
           }
           break;
         }
+        case "award": {
+          if (!player.hasPermission("tagger.admin")) {
+            player.sendMessage(Utils.format("Insufficient Permissions!"));
+            return true;
+          }
+          if (args.length < 3) {
+            player.sendMessage(Utils.format("Correct Usage: /tags award <player> <name>"));
+            return true;
+          }
+
+          Optional<? extends Player> optionalPlayer = Bukkit.getOnlinePlayers().stream().filter(p -> p.getName().equalsIgnoreCase(args[1])).findFirst();
+          if (optionalPlayer.isEmpty()) {
+            player.sendMessage(Utils.format("Player not found!"));
+            return true;
+          }
+          Player target = optionalPlayer.get();
+
+          String name = args[2];
+          if (!databaseManager.getCachedTags().containsKey(name)) {
+            player.sendMessage(Utils.format("Invalid tag!"));
+            return true;
+          }
+          Tag tag = databaseManager.getCachedTags().get(name);
+
+          if (databaseManager.hasPermission(target.getUniqueId(), tag)) {
+            player.sendMessage(Utils.format("Player already has this tag!"));
+            return true;
+          }
+
+          try {
+            databaseManager.awardTag(target.getUniqueId(), tag);
+            player.sendMessage(Utils.format("Successfully awarded tag!"));
+            target.sendMessage(Utils.format("You've been rewarded the " + StringUtils.capitalize(tag.getName()) + " tag!"));
+          } catch (SQLException e) {
+            e.printStackTrace();
+            player.sendMessage(Utils.format(ChatColor.RED + "Error while awarding tag!"));
+          }
+          break;
+        }
+        case "revoke": {
+          if (!player.hasPermission("tagger.admin")) {
+            player.sendMessage(Utils.format("Insufficient Permissions!"));
+            return true;
+          }
+          if (args.length < 3) {
+            player.sendMessage(Utils.format("Correct Usage: /tags revoke <player> <name>"));
+            return true;
+          }
+
+          Optional<? extends Player> optionalPlayer = Bukkit.getOnlinePlayers().stream().filter(p -> p.getName().equalsIgnoreCase(args[1])).findFirst();
+          if (optionalPlayer.isEmpty()) {
+            player.sendMessage(Utils.format("Player not found!"));
+            return true;
+          }
+          Player target = optionalPlayer.get();
+
+          String name = args[2];
+          if (!databaseManager.getCachedTags().containsKey(name)) {
+            player.sendMessage(Utils.format("Invalid tag!"));
+            return true;
+          }
+          Tag tag = databaseManager.getCachedTags().get(name);
+
+          if (!databaseManager.hasPermission(target.getUniqueId(), tag)) {
+            player.sendMessage(Utils.format("Player doesn't have this tag!"));
+            return true;
+          }
+
+          try {
+            databaseManager.awardTag(target.getUniqueId(), tag);
+            player.sendMessage(Utils.format("Successfully revoked tag!"));
+            target.sendMessage(Utils.format("You've been revoked of the " + StringUtils.capitalize(tag.getName()) + " tag!"));
+          } catch (SQLException e) {
+            e.printStackTrace();
+            player.sendMessage(Utils.format(ChatColor.RED + "Error while revoking tag!"));
+          }
+          break;
+        }
         default: {
           player.sendMessage(Utils.format("Invalid Argument!"));
           break;
@@ -103,7 +184,14 @@ public class TagCommand implements CommandExecutor, TabCompleter {
   public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
     List<String> completions = new ArrayList<>();
     if (args.length == 1) {
-      return copyPartialMatches(args[0], Arrays.asList("create", "shop"));
+      return copyPartialMatches(args[0], Arrays.asList("create", "shop", "award", "revoke"));
+    }
+    if (args[0].equalsIgnoreCase("award") || args[0].equalsIgnoreCase("revoke")) {
+      if (args.length == 2) {
+        return matchPlayerName(args[1]);
+      } else if (args.length == 3) {
+        return copyPartialMatches(args[2], databaseManager.getCachedTags().keySet());
+      }
     }
     return completions;
   }
@@ -112,5 +200,11 @@ public class TagCommand implements CommandExecutor, TabCompleter {
     List<String> matches = new ArrayList<>();
     StringUtil.copyPartialMatches(search, stack, matches);
     return matches;
+  }
+
+  private List<String> matchPlayerName(String search) {
+    List<String> playerNames = new ArrayList<>();
+    Bukkit.getOnlinePlayers().forEach(o -> playerNames.add(o.getName()));
+    return copyPartialMatches(search, playerNames);
   }
 }

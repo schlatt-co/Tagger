@@ -37,7 +37,7 @@ public class TagSelectorGUI implements InventoryProvider {
     List<ClickableItem> tags = new ArrayList<>();
 
     for (Tag tag : databaseManager.getOwnedTags().get(player.getUniqueId())) {
-      tags.add(ClickableItem.of(Utils.item(Material.NAME_TAG, StringUtils.capitalize(tag.getName()), tag.getName().equalsIgnoreCase(activeTag.getName()), "&aClick to equip!", "", "&fTag: " + tag.getText()), inventoryClickEvent -> {
+      tags.add(ClickableItem.of(Utils.item(Material.NAME_TAG, StringUtils.capitalize(tag.getName()), "&aClick to equip!", "", "&fTag: " + tag.getText()), inventoryClickEvent -> {
         try {
           databaseManager.setActiveTag(player.getUniqueId(), tag);
           inventoryManager.getInventory(player).get().close(player);

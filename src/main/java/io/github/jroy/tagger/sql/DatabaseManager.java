@@ -77,6 +77,22 @@ public class DatabaseManager implements Listener {
     ownedTags.remove(event.getPlayer().getUniqueId());
   }
 
+  public void awardTag(UUID uuid, Tag tag) throws SQLException {
+    PreparedStatement statement = connection.prepareStatement("INSERT INTO `usertags` (uuid, tagname) VALUES (?, ?);");
+    statement.setString(1, uuid.toString());
+    statement.setString(2, tag.getName());
+    statement.executeUpdate();
+    ownedTags.get(uuid).add(tag);
+  }
+
+  public void revokeTag(UUID uuid, Tag tag) throws SQLException {
+    PreparedStatement statement = connection.prepareStatement("DELETE FROM `usertags` WHERE uuid = ? AND tagname = ?");
+    statement.setString(1, uuid.toString());
+    statement.setString(2, tag.getName());
+    statement.executeUpdate();
+    ownedTags.get(uuid).remove(tag);
+  }
+
   private List<Tag> getUserTags(UUID uuid) throws SQLException {
     PreparedStatement statement = connection.prepareStatement("SELECT  * FROM `usertags` WHERE uuid = ?;");
     statement.setString(1, uuid.toString());
@@ -89,7 +105,7 @@ public class DatabaseManager implements Listener {
     return tags;
   }
 
-  private boolean hasPermission(UUID uuid, Tag tag) {
+  public boolean hasPermission(UUID uuid, Tag tag) {
     if (tag.getName().equalsIgnoreCase("none")) {
       return true;
     }

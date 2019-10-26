@@ -16,9 +16,11 @@ import io.github.jroy.tagger.sql.Tag;
 import io.github.jroy.tagger.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,17 +59,23 @@ public class TagShopGUI implements InventoryProvider {
                 player.sendMessage(Utils.format("Insufficient Funds"));
                 return;
               }
-
-              Tagger.economy.withdrawPlayer(player, tag.getPrice());
               Optional<AccountLink> optional = DatabaseHelper.getInstance().getCompanyByName("Admins").getAccounts().stream().filter(accountLink -> accountLink.getAccount().getName().equalsIgnoreCase("Main")).findAny();
               if (optional.isPresent()) {
+                Tagger.economy.withdrawPlayer(player, tag.getPrice());
                 AccountLink accountLink = optional.get();
                 Account account = accountLink.getAccount();
                 account.addBalance(tag.getPrice());
                 DatabaseHelper.getInstance().getDatabaseManager().updateAccount(account);
-                DatabaseHelper.getInstance().getDatabaseManager().logTransaction(new Transaction(accountLink, player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag from " + player.getName(), tag.getPrice()));
+                DatabaseHelper.getInstance().getDatabaseManager().logTransaction(new Transaction(accountLink, player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", tag.getPrice()));
+                try {
+                  databaseManager.awardTag(player.getUniqueId(), tag);
+                } catch (SQLException e) {
+                  player.sendMessage(Utils.format(ChatColor.RED + "Error while awarding tag! Contact Joshie please!"));
+                  e.printStackTrace();
+                  return;
+                }
+                player.sendMessage(Utils.format("Successfully purchased tag!"));
               }
-              player.sendMessage(Utils.format("Successfully purchased tag!"));
             }
           })
           .open(player)));

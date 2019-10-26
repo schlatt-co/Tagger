@@ -2,8 +2,6 @@ package io.github.jroy.tagger.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -14,14 +12,10 @@ import java.util.List;
 public class Utils {
 
   public static ItemStack item(Material material, String name, String... lore) {
-    return item(material, name, false, lore);
+    return item(material, name, Arrays.asList(lore));
   }
 
-  public static ItemStack item(Material material, String name, boolean shine, String... lore) {
-    return item(material, name, shine, Arrays.asList(lore));
-  }
-
-  public static ItemStack item(Material material, String name, boolean shine, List<String> lore) {
+  public static ItemStack item(Material material, String name, List<String> lore) {
     ItemStack itemStack = new ItemStack(material);
     ItemMeta itemMeta = itemStack.getItemMeta();
     //noinspection ConstantConditions
@@ -31,10 +25,6 @@ public class Utils {
       lores.add(ChatColor.translateAlternateColorCodes('&', curLore));
     }
     itemMeta.setLore(lores);
-    Enchantment enchantment = EnchantmentWrapper.getByName("glow");
-    if (shine && enchantment != null) {
-      itemMeta.addEnchant(enchantment, 1, true);
-    }
     itemStack.setItemMeta(itemMeta);
     return itemStack;
   }
