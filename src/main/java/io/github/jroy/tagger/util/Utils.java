@@ -31,7 +31,7 @@ public class Utils {
       lores.add(ChatColor.translateAlternateColorCodes('&', curLore));
     }
     itemMeta.setLore(lores);
-    Enchantment enchantment = EnchantmentWrapper.getByName("shine");
+    Enchantment enchantment = EnchantmentWrapper.getByName("glow");
     if (shine && enchantment != null) {
       itemMeta.addEnchant(enchantment, 1, true);
     }
