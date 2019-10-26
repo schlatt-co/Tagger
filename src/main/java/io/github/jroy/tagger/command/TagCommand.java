@@ -48,7 +48,7 @@ public class TagCommand implements CommandExecutor, TabCompleter {
       switch (args[0]) {
         case "shop": {
           SmartInventory.builder()
-              .id("tagSelectorGui")
+              .id("tagShopGui")
               .provider(new TagShopGUI(databaseManager, inventoryManager))
               .manager(inventoryManager)
               .title("Tag Shop")
@@ -124,7 +124,7 @@ public class TagCommand implements CommandExecutor, TabCompleter {
           try {
             databaseManager.awardTag(target.getUniqueId(), tag);
             player.sendMessage(Utils.format("Successfully awarded tag!"));
-            target.sendMessage(Utils.format("You've been rewarded the " + StringUtils.capitalize(tag.getName()) + " tag!"));
+            target.sendMessage(Utils.format("You've been awarded the " + StringUtils.capitalize(tag.getName()) + " tag! Use " + ChatColor.RED + "/tags" + ChatColor.YELLOW + " to apply it!"));
           } catch (SQLException e) {
             e.printStackTrace();
             player.sendMessage(Utils.format(ChatColor.RED + "Error while awarding tag!"));

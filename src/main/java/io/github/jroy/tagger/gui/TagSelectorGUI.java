@@ -2,6 +2,7 @@ package io.github.jroy.tagger.gui;
 
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.InventoryManager;
+import fr.minuskube.inv.SmartInventory;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
@@ -64,6 +65,14 @@ public class TagSelectorGUI implements InventoryProvider {
         e -> inventoryManager.getInventory(player).get().open(player, pagination.previous().getPage())));
     contents.set(5, 5, ClickableItem.of(Utils.item(Material.ARROW, "Next page"),
         e -> inventoryManager.getInventory(player).get().open(player, pagination.next().getPage())));
+    contents.set(0, 4, ClickableItem.of(Utils.item(Material.EMERALD, "&dClick to Shop", "&eClick to visit the shop and", "&ebrowse available tags!"), e -> {
+      SmartInventory.builder()
+          .id("tagShopGui")
+          .provider(new TagShopGUI(databaseManager, inventoryManager))
+          .manager(inventoryManager)
+          .title("Tag Shop")
+          .build().open(player);
+    }));
   }
 
   @Override

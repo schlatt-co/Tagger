@@ -6,6 +6,7 @@ import dev.tycho.stonks.model.core.AccountLink;
 import dev.tycho.stonks.model.logging.Transaction;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.InventoryManager;
+import fr.minuskube.inv.SmartInventory;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
@@ -96,6 +97,14 @@ public class TagShopGUI implements InventoryProvider {
         e -> inventoryManager.getInventory(player).get().open(player, pagination.previous().getPage())));
     contents.set(5, 5, ClickableItem.of(Utils.item(Material.ARROW, "Next page"),
         e -> inventoryManager.getInventory(player).get().open(player, pagination.next().getPage())));
+    contents.set(0, 4, ClickableItem.of(Utils.item(Material.BOOK, "&dClick for Inventory", "&eClick to go back to your", "&eavailable tags!"), e -> {
+      SmartInventory.builder()
+          .id("tagSelectorGui")
+          .provider(new TagSelectorGUI(databaseManager, inventoryManager))
+          .manager(inventoryManager)
+          .title("Tag Selector")
+          .build().open(player);
+    }));
   }
 
   @Override
