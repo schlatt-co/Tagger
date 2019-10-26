@@ -82,7 +82,7 @@ public class TagCommand implements CommandExecutor, TabCompleter {
             tagBuilder.append(arg).append(" ");
           }
           String tag = tagBuilder.toString();
-          tag = tag.replaceFirst(args[0] + " ", "").replaceFirst(args[1] + " ", "").replaceFirst(args[2] + " ", "");
+          tag = tag.replaceFirst(args[0] + " ", "").replaceFirst(args[1] + " ", "").replaceFirst(args[2] + " ", "").trim();
           try {
             databaseManager.createTag(name, tag, price);
             player.sendMessage(Utils.format("Successfully created tag with name: " + ChatColor.RED + name + ChatColor.YELLOW + ", price: " + ChatColor.RED + "$" + price + ChatColor.YELLOW + ", and text, " + ChatColor.RED + tag));
@@ -161,12 +161,61 @@ public class TagCommand implements CommandExecutor, TabCompleter {
           }
 
           try {
-            databaseManager.awardTag(target.getUniqueId(), tag);
+            databaseManager.revokeTag(target.getUniqueId(), tag);
             player.sendMessage(Utils.format("Successfully revoked tag!"));
             target.sendMessage(Utils.format("You've been revoked of the " + StringUtils.capitalize(tag.getName()) + " tag!"));
           } catch (SQLException e) {
             e.printStackTrace();
             player.sendMessage(Utils.format(ChatColor.RED + "Error while revoking tag!"));
+          }
+          break;
+        }
+        case "edit": {
+          if (!player.hasPermission("tagger.admin")) {
+            player.sendMessage(Utils.format("Insufficient Permissions!"));
+            return true;
+          }
+
+          if (args.length < 4) {
+            player.sendMessage(Utils.format("Correct Usage: /tags edit <tag> <price/text> <value>"));
+            return true;
+          }
+
+          if (!databaseManager.getCachedTags().containsKey(args[1])) {
+            player.sendMessage(Utils.format("Invalid tag!"));
+            return true;
+          }
+          Tag tag = databaseManager.getCachedTags().get(args[1]);
+
+          if (args[2].equalsIgnoreCase("price")) {
+            if (!StringUtils.isNumeric(args[3])) {
+              player.sendMessage(Utils.format("Invalid Price!"));
+              return true;
+            }
+            try {
+              databaseManager.setPrice(tag, Integer.parseInt(args[3]));
+              player.sendMessage(Utils.format("Updated price successfully!"));
+            } catch (SQLException e) {
+              e.printStackTrace();
+              player.sendMessage(Utils.format(ChatColor.RED + "Error while editing tag!"));
+            }
+          } else if (args[2].equalsIgnoreCase("text")) {
+            StringBuilder tagBuilder = new StringBuilder();
+            for (String arg : args) {
+              tagBuilder.append(arg).append(" ");
+            }
+            String newText = tagBuilder.toString();
+            newText = newText.replaceFirst(args[0] + " ", "").replaceFirst(args[1] + " ", "").replaceFirst(args[2] + " ", "").trim();
+            try {
+              databaseManager.setText(tag, newText);
+              player.sendMessage(Utils.format("Updated text successfully!"));
+            } catch (SQLException e) {
+              e.printStackTrace();
+              player.sendMessage(Utils.format(ChatColor.RED + "Error while editing tag!"));
+            }
+          } else {
+            player.sendMessage(Utils.format("Invalid edit option!"));
+            return true;
           }
           break;
         }
@@ -184,13 +233,19 @@ public class TagCommand implements CommandExecutor, TabCompleter {
   public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
     List<String> completions = new ArrayList<>();
     if (args.length == 1) {
-      return copyPartialMatches(args[0], Arrays.asList("create", "shop", "award", "revoke"));
+      return copyPartialMatches(args[0], Arrays.asList("create", "shop", "award", "revoke", "edit"));
     }
     if (args[0].equalsIgnoreCase("award") || args[0].equalsIgnoreCase("revoke")) {
       if (args.length == 2) {
         return matchPlayerName(args[1]);
       } else if (args.length == 3) {
         return copyPartialMatches(args[2], databaseManager.getCachedTags().keySet());
+      }
+    } else if (args[0].equalsIgnoreCase("edit")) {
+      if (args.length == 2) {
+        return copyPartialMatches(args[1], databaseManager.getCachedTags().keySet());
+      } else if (args.length == 3) {
+        return copyPartialMatches(args[2], Arrays.asList("text", "price"));
       }
     }
     return completions;

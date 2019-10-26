@@ -77,6 +77,20 @@ public class DatabaseManager implements Listener {
     ownedTags.remove(event.getPlayer().getUniqueId());
   }
 
+  public void setPrice(Tag tag, int newPrice) throws SQLException {
+    PreparedStatement statement = connection.prepareStatement("UPDATE `tags` SET price = ? WHERE `name` = ?;");
+    statement.setInt(1, newPrice);
+    statement.setString(2, tag.getName());
+    statement.executeUpdate();
+  }
+
+  public void setText(Tag tag, String text) throws SQLException {
+    PreparedStatement statement = connection.prepareStatement("UPDATE `tags` SET `text` = ? WHERE `name` = ?;");
+    statement.setString(1, text);
+    statement.setString(2, tag.getName());
+    statement.executeUpdate();
+  }
+
   public void awardTag(UUID uuid, Tag tag) throws SQLException {
     PreparedStatement statement = connection.prepareStatement("INSERT INTO `usertags` (uuid, tagname) VALUES (?, ?);");
     statement.setString(1, uuid.toString());
