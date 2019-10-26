@@ -3,6 +3,7 @@ package io.github.jroy.tagger.sql;
 import io.github.jroy.tagger.events.TaggerTagUpdateEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,21 +55,34 @@ public class DatabaseManager implements Listener {
   @EventHandler(priority = EventPriority.MONITOR)
   public void onPlayerJoin(AsyncPlayerPreLoginEvent event) {
     try {
-      if (!hasActiveTag(event.getUniqueId())) {
-        createActiveTag(event.getUniqueId());
-      }
-
-      Tag tag = getActiveTag(event.getUniqueId());
-      if (!hasPermission(event.getUniqueId(), tag)) {
-        setActiveTag(event.getUniqueId(), noneTag);
-        tag = noneTag;
-      }
-      activeTags.put(event.getUniqueId(), tag);
-      ownedTags.put(event.getUniqueId(), getUserTags(event.getUniqueId()));
-      Bukkit.getPluginManager().callEvent(new TaggerTagUpdateEvent(event.getUniqueId(), tag));
+      syncPlayer(event.getUniqueId());
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  private void syncCache() throws SQLException {
+    cachedTags = getTags();
+    activeTags.clear();
+    ownedTags.clear();
+    for (Player curPlayer : Bukkit.getOnlinePlayers()) {
+      syncPlayer(curPlayer.getUniqueId());
+    }
+  }
+
+  private void syncPlayer(UUID uuid) throws SQLException {
+    if (!hasActiveTag(uuid)) {
+      createActiveTag(uuid);
+    }
+
+    Tag tag = getActiveTag(uuid);
+    if (!hasPermission(uuid, tag)) {
+      setActiveTag(uuid, noneTag);
+      tag = noneTag;
+    }
+    activeTags.put(uuid, tag);
+    ownedTags.put(uuid, getUserTags(uuid));
+    Bukkit.getPluginManager().callEvent(new TaggerTagUpdateEvent(uuid, tag));
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -82,6 +96,7 @@ public class DatabaseManager implements Listener {
     statement.setInt(1, newPrice);
     statement.setString(2, tag.getName());
     statement.executeUpdate();
+    syncCache();
   }
 
   public void setText(Tag tag, String text) throws SQLException {
@@ -89,6 +104,7 @@ public class DatabaseManager implements Listener {
     statement.setString(1, text);
     statement.setString(2, tag.getName());
     statement.executeUpdate();
+    syncCache();
   }
 
   public void awardTag(UUID uuid, Tag tag) throws SQLException {
