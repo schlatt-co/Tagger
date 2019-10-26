@@ -60,7 +60,7 @@ public class TagSelectorGUI implements InventoryProvider {
     Pagination pagination = contents.pagination();
     pagination.setItems(items);
     pagination.setItemsPerPage(36);
-    pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL,1, 0));
+    pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 1, 0));
     contents.set(5, 3, ClickableItem.of(Utils.item(Material.ARROW, "Previous page"),
         e -> inventoryManager.getInventory(player).get().open(player, pagination.previous().getPage())));
     contents.set(5, 5, ClickableItem.of(Utils.item(Material.ARROW, "Next page"),
