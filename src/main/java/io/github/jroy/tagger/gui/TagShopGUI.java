@@ -1,11 +1,16 @@
 package io.github.jroy.tagger.gui;
 
+import dev.tycho.stonks.managers.DatabaseHelper;
+import dev.tycho.stonks.model.core.Account;
+import dev.tycho.stonks.model.core.AccountLink;
+import dev.tycho.stonks.model.logging.Transaction;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.InventoryManager;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
 import fr.minuskube.inv.content.SlotIterator;
+import io.github.jroy.tagger.Tagger;
 import io.github.jroy.tagger.sql.DatabaseManager;
 import io.github.jroy.tagger.sql.Tag;
 import io.github.jroy.tagger.util.Utils;
@@ -17,6 +22,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class TagShopGUI implements InventoryProvider {
@@ -47,7 +53,21 @@ public class TagShopGUI implements InventoryProvider {
           .inventoryManager(inventoryManager)
           .onChoiceMade(aBoolean -> {
             if (aBoolean) {
-              //purchase logic
+              if (!Tagger.economy.has(player, tag.getPrice())) {
+                player.sendMessage(Utils.format("Insufficient Funds"));
+                return;
+              }
+
+              Tagger.economy.withdrawPlayer(player, tag.getPrice());
+              Optional<AccountLink> optional = DatabaseHelper.getInstance().getCompanyByName("Admins").getAccounts().stream().filter(accountLink -> accountLink.getAccount().getName().equalsIgnoreCase("Main")).findAny();
+              if (optional.isPresent()) {
+                AccountLink accountLink = optional.get();
+                Account account = accountLink.getAccount();
+                account.addBalance(tag.getPrice());
+                DatabaseHelper.getInstance().getDatabaseManager().updateAccount(account);
+                DatabaseHelper.getInstance().getDatabaseManager().logTransaction(new Transaction(accountLink, player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag from " + player.getName(), tag.getPrice()));
+              }
+              player.sendMessage(Utils.format("Successfully purchased tag!"));
             }
           })
           .open(player)));
@@ -63,7 +83,7 @@ public class TagShopGUI implements InventoryProvider {
     Pagination pagination = contents.pagination();
     pagination.setItems(items);
     pagination.setItemsPerPage(36);
-    pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL,1, 0));
+    pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 1, 0));
     contents.set(5, 3, ClickableItem.of(Utils.item(Material.ARROW, "Previous page"),
         e -> inventoryManager.getInventory(player).get().open(player, pagination.previous().getPage())));
     contents.set(5, 5, ClickableItem.of(Utils.item(Material.ARROW, "Next page"),

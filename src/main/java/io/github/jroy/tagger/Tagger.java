@@ -4,8 +4,10 @@ import fr.minuskube.inv.InventoryManager;
 import io.github.jroy.tagger.command.TagCommand;
 import io.github.jroy.tagger.sql.DatabaseManager;
 import io.github.jroy.tagger.util.GlowEnchantment;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -13,6 +15,8 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class Tagger extends JavaPlugin {
+
+  public static Economy economy;
 
   @Override
   public void onEnable() {
@@ -54,5 +58,10 @@ public class Tagger extends JavaPlugin {
     TagCommand tagCommand = new TagCommand(databaseManager, inventoryManager);
     Objects.requireNonNull(getCommand("tags")).setExecutor(tagCommand);
     Objects.requireNonNull(getCommand("tags")).setTabCompleter(tagCommand);
+    RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+    if (rsp != null) {
+      economy = rsp.getProvider();
+    }
+
   }
 }
