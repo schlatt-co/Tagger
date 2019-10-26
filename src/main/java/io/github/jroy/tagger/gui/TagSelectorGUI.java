@@ -33,7 +33,6 @@ public class TagSelectorGUI implements InventoryProvider {
     contents.fillRow(0, ClickableItem.empty(Utils.item(Material.BLACK_STAINED_GLASS_PANE, " ")));
     contents.fillRow(5, ClickableItem.empty(Utils.item(Material.BLACK_STAINED_GLASS_PANE, " ")));
 
-    Tag activeTag = databaseManager.getActiveTags().get(player.getUniqueId());
     List<ClickableItem> tags = new ArrayList<>();
 
     for (Tag tag : databaseManager.getOwnedTags().get(player.getUniqueId())) {
