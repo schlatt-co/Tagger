@@ -2,13 +2,12 @@ package io.github.jroy.tagger.events;
 
 import io.github.jroy.tagger.sql.Tag;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
 public class TaggerTagUpdateEvent extends Event {
 
   private static final HandlerList handlers = new HandlerList();
@@ -17,6 +16,12 @@ public class TaggerTagUpdateEvent extends Event {
   private final UUID playerUuid;
   @Getter
   private final Tag tag;
+
+  public TaggerTagUpdateEvent(UUID playerUuid, Tag tag) {
+    super(!Bukkit.getServer().isPrimaryThread());
+    this.playerUuid = playerUuid;
+    this.tag = tag;
+  }
 
   @Override
   public HandlerList getHandlers() {

@@ -6,6 +6,6 @@ import lombok.Data;
 public class Tag {
   private final int id;
   private final String name;
-  private final long price;
+  private final int price;
   private final String text;
 }
