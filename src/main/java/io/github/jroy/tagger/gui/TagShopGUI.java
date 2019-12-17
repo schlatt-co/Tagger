@@ -1,9 +1,8 @@
 package io.github.jroy.tagger.gui;
 
-import dev.tycho.stonks.managers.DatabaseHelper;
+import dev.tycho.stonks.managers.Repo;
 import dev.tycho.stonks.model.core.Account;
-import dev.tycho.stonks.model.core.AccountLink;
-import dev.tycho.stonks.model.logging.Transaction;
+import dev.tycho.stonks.model.core.Company;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.InventoryManager;
 import fr.minuskube.inv.SmartInventory;
@@ -25,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class TagShopGUI implements InventoryProvider {
@@ -60,23 +58,22 @@ public class TagShopGUI implements InventoryProvider {
                 player.sendMessage(Utils.format("Insufficient Funds"));
                 return;
               }
-              Optional<AccountLink> optional = DatabaseHelper.getInstance().getCompanyByName("Admins").getAccounts().stream().filter(accountLink -> accountLink.getAccount().getName().equalsIgnoreCase("Main")).findAny();
-              if (optional.isPresent()) {
-                Tagger.economy.withdrawPlayer(player, tag.getPrice());
-                AccountLink accountLink = optional.get();
-                Account account = accountLink.getAccount();
-                account.addBalance(tag.getPrice());
-                DatabaseHelper.getInstance().getDatabaseManager().updateAccount(account);
-                DatabaseHelper.getInstance().getDatabaseManager().logTransaction(new Transaction(accountLink, player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", tag.getPrice()));
-                try {
-                  databaseManager.awardTag(player.getUniqueId(), tag);
-                } catch (SQLException e) {
-                  player.sendMessage(Utils.format(ChatColor.RED + "Error while awarding tag! Contact Joshie please!"));
-                  e.printStackTrace();
-                  return;
-                }
-                player.sendMessage(Utils.format("Successfully purchased tag!"));
+              Company c = Repo.getInstance().companies().getWhere(co -> co.name.equals("Admins"));
+              if (c == null) return;
+              Account account = c.accounts.stream().filter(a -> a.name.equals("Main")).findFirst().orElse(null);
+              if (account == null) {
+                account = Repo.getInstance().createCompanyAccount(c, "Main");
               }
+              Tagger.economy.withdrawPlayer(player, tag.getPrice());
+              Repo.getInstance().payAccount(player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", account, tag.getPrice());
+              try {
+                databaseManager.awardTag(player.getUniqueId(), tag);
+              } catch (SQLException e) {
+                player.sendMessage(Utils.format(ChatColor.RED + "Error while awarding tag! Contact Joshie please!"));
+                e.printStackTrace();
+                return;
+              }
+              player.sendMessage(Utils.format("Successfully purchased tag!"));
             }
           })
           .open(player)));
@@ -97,14 +94,13 @@ public class TagShopGUI implements InventoryProvider {
         e -> inventoryManager.getInventory(player).get().open(player, pagination.previous().getPage())));
     contents.set(5, 5, ClickableItem.of(Utils.item(Material.ARROW, "Next page"),
         e -> inventoryManager.getInventory(player).get().open(player, pagination.next().getPage())));
-    contents.set(0, 4, ClickableItem.of(Utils.item(Material.BOOK, "&dClick for Inventory", "&eClick to go back to your", "&eavailable tags!"), e -> {
-      SmartInventory.builder()
-          .id("tagSelectorGui")
-          .provider(new TagSelectorGUI(databaseManager, inventoryManager))
-          .manager(inventoryManager)
-          .title("Tag Selector")
-          .build().open(player);
-    }));
+    contents.set(0, 4, ClickableItem.of(Utils.item(Material.BOOK, "&dClick for Inventory", "&eClick to go back to your", "&eavailable tags!"), e ->
+        SmartInventory.builder()
+        .id("tagSelectorGui")
+        .provider(new TagSelectorGUI(databaseManager, inventoryManager))
+        .manager(inventoryManager)
+        .title("Tag Selector")
+        .build().open(player)));
   }
 
   @Override

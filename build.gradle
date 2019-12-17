@@ -21,6 +21,5 @@ dependencies {
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.18'
     compileOnly 'org.projectlombok:lombok:1.18.8'
     compileOnly files('libs/stonks.jar')
-    compileOnly "com.j256.ormlite:ormlite-core:5.1" //Stonks depend
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 }
