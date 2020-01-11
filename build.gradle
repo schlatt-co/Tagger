@@ -17,7 +17,7 @@ repositories {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.15.1-R0.1-SNAPSHOT"
     compileOnly 'org.projectlombok:lombok:1.18.8'
-    compileOnly 'com.github.schlatt-co:stonks:3ed613d573'
+    compileOnly 'com.github.schlatt-co:stonks:2e872985b3'
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
     compileOnly "com.github.schlatt-co:PluginLibrary:c65436d5b6"
 

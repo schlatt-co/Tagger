@@ -6,6 +6,7 @@ import io.github.jroy.tagger.command.TagCommand;
 import io.github.jroy.tagger.sql.DatabaseManager;
 import io.github.jroy.tagger.util.CompanyTagPerk;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -38,7 +39,9 @@ public class Tagger extends JavaPlugin {
     }
     getServer().getPluginManager().registerEvents(databaseManager, this);
     getLogger().info("Loaded DatabaseManager!");
-    StonksAPI.registerPerk(new CompanyTagPerk(this, databaseManager));
+    CompanyTagPerk perk = new CompanyTagPerk(this, databaseManager);
+    Bukkit.getServer().getPluginManager().registerEvents(perk, this);
+    StonksAPI.registerPerk(perk);
     InventoryManager inventoryManager = new InventoryManager(this);
     inventoryManager.init();
     TagCommand tagCommand = new TagCommand(databaseManager, inventoryManager);

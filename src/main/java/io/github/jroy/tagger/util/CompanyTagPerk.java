@@ -1,5 +1,6 @@
 package io.github.jroy.tagger.util;
 
+import dev.tycho.stonks.api.event.CompanyJoinEvent;
 import dev.tycho.stonks.api.event.CompanyKickEvent;
 import dev.tycho.stonks.api.event.CompanyRenameEvent;
 import dev.tycho.stonks.api.perks.CompanyPerk;
@@ -43,6 +44,17 @@ public class CompanyTagPerk extends CompanyPerk implements Listener {
     if (databaseManager.getCachedTags().containsKey("company_" + event.getCompany().pk)) {
       try {
         databaseManager.setText(databaseManager.getCachedTags().get("company_" + event.getCompany().pk), fetchTag(event.getNewName()));
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  @EventHandler
+  public void onCompanyJoin(CompanyJoinEvent event) {
+    if (databaseManager.getCachedTags().containsKey("company_" + event.getCompany().pk)) {
+      try {
+        databaseManager.awardTag(event.getPlayer().getUniqueId(), databaseManager.getCachedTags().get("company_" + event.getCompany().pk));
       } catch (SQLException e) {
         e.printStackTrace();
       }
