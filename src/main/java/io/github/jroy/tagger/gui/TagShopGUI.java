@@ -1,5 +1,7 @@
 package io.github.jroy.tagger.gui;
 
+import dev.tycho.stonks.api.StonksAPI;
+import dev.tycho.stonks.api.StonksAPIException;
 import dev.tycho.stonks.managers.Repo;
 import dev.tycho.stonks.model.core.Account;
 import dev.tycho.stonks.model.core.Company;
@@ -58,11 +60,14 @@ public class TagShopGUI implements InventoryProvider {
                 player.sendMessage(Utils.format("Insufficient Funds"));
                 return;
               }
-              Company c = Repo.getInstance().companies().getWhere(co -> co.name.equals("Admins"));
+              Company c = StonksAPI.getCompany("Admins");
               if (c == null) return;
-              Account account = c.accounts.stream().filter(a -> a.name.equals("Main")).findFirst().orElse(null);
-              if (account == null) {
-                account = Repo.getInstance().createCompanyAccount(c, "Main");
+              Account account;
+              try {
+                account = StonksAPI.getOrCreateAccount(c, "Main");
+              } catch (StonksAPIException e) {
+                e.printStackTrace();
+                return;
               }
               Tagger.economy.withdrawPlayer(player, tag.getPrice());
               Repo.getInstance().payAccount(player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", account, tag.getPrice());

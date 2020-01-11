@@ -1,10 +1,11 @@
 package io.github.jroy.tagger;
 
+import dev.tycho.stonks.api.StonksAPI;
 import fr.minuskube.inv.InventoryManager;
 import io.github.jroy.tagger.command.TagCommand;
 import io.github.jroy.tagger.sql.DatabaseManager;
+import io.github.jroy.tagger.util.CompanyTagPerk;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,6 +38,7 @@ public class Tagger extends JavaPlugin {
     }
     getServer().getPluginManager().registerEvents(databaseManager, this);
     getLogger().info("Loaded DatabaseManager!");
+    StonksAPI.registerPerk(new CompanyTagPerk(this, databaseManager));
     InventoryManager inventoryManager = new InventoryManager(this);
     inventoryManager.init();
     TagCommand tagCommand = new TagCommand(databaseManager, inventoryManager);
