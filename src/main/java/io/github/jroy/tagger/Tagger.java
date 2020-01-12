@@ -39,9 +39,12 @@ public class Tagger extends JavaPlugin {
     }
     getServer().getPluginManager().registerEvents(databaseManager, this);
     getLogger().info("Loaded DatabaseManager!");
-    CompanyTagPerk perk = new CompanyTagPerk(this, databaseManager);
-    Bukkit.getServer().getPluginManager().registerEvents(perk, this);
-    StonksAPI.registerPerk(perk);
+    if (getServer().getPluginManager().getPlugin("Stonks") != null) {
+      getLogger().info("Loading Stonks Integration...");
+      CompanyTagPerk perk = new CompanyTagPerk(this, databaseManager);
+      Bukkit.getServer().getPluginManager().registerEvents(perk, this);
+      StonksAPI.registerPerk(perk);
+    }
     InventoryManager inventoryManager = new InventoryManager(this);
     inventoryManager.init();
     TagCommand tagCommand = new TagCommand(databaseManager, inventoryManager);

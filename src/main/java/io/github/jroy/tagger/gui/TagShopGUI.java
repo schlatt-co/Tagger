@@ -18,6 +18,7 @@ import io.github.jroy.tagger.sql.Tag;
 import io.github.jroy.tagger.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -55,22 +56,24 @@ public class TagShopGUI implements InventoryProvider {
           .info(Arrays.asList("&eClicking \"YES\" will accept a fee", "&eof &a$" + tag.getPrice() + " &eto purchase this tag!"))
           .inventoryManager(inventoryManager)
           .onChoiceMade(aBoolean -> {
+            Tagger.economy.withdrawPlayer(player, tag.getPrice());
             if (aBoolean) {
               if (!Tagger.economy.has(player, tag.getPrice())) {
                 player.sendMessage(Utils.format("Insufficient Funds"));
                 return;
               }
-              Company c = StonksAPI.getCompany("Admins");
-              if (c == null) return;
-              Account account;
-              try {
-                account = StonksAPI.getOrCreateAccount(c, "Main");
-              } catch (StonksAPIException e) {
-                e.printStackTrace();
-                return;
+              if (Bukkit.getServer().getPluginManager().getPlugin("Stonks") != null) {
+                Company c = StonksAPI.getCompany("Admins");
+                if (c == null) return;
+                Account account;
+                try {
+                  account = StonksAPI.getOrCreateAccount(c, "Main");
+                } catch (StonksAPIException e) {
+                  e.printStackTrace();
+                  return;
+                }
+                Repo.getInstance().payAccount(player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", account, tag.getPrice());
               }
-              Tagger.economy.withdrawPlayer(player, tag.getPrice());
-              Repo.getInstance().payAccount(player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", account, tag.getPrice());
               try {
                 databaseManager.awardTag(player.getUniqueId(), tag);
               } catch (SQLException e) {
