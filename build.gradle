@@ -8,7 +8,6 @@ group 'io.github.jroy'
 
 repositories {
     mavenCentral()
-    jcenter()
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://jitpack.io' }
@@ -20,6 +19,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.8'
     compileOnly 'com.github.schlatt-co:stonks:2e872985b3'
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
-    compileOnly "com.github.schlatt-co:PluginLibrary:ffa1b533bb"
+    compileOnly "com.github.schlatt-co:PluginLibrary:c65436d5b6"
 
 }
