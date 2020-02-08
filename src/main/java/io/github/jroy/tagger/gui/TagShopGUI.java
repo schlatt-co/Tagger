@@ -43,6 +43,10 @@ public class TagShopGUI implements InventoryProvider {
     List<Tag> allTags = new ArrayList<>(databaseManager.getCachedTags().values());
     List<String> ownedTags = new ArrayList<>();
     for (Tag tag : databaseManager.getOwnedTags().get(player.getUniqueId())) {
+      if (tag == null) {
+        Bukkit.getLogger().warning("Null tag!");
+        continue;
+      }
       ownedTags.add(tag.getName());
     }
 
