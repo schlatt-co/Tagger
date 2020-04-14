@@ -25,7 +25,7 @@ public class CompanyTagPerk extends CompanyPerk implements Listener {
   private final DatabaseManager databaseManager;
 
   public CompanyTagPerk(Plugin plugin, DatabaseManager databaseManager) {
-    super(plugin, "Company Tag", Material.NAME_TAG, 300000, new String[]{"This perk allows you and your company members to have",
+    super(plugin, "Company Tag", Material.NAME_TAG, 300000, true, new String[]{"This perk allows you and your company members to have",
         "a custom tag in front if your name. This tag cam be selected from",
         "the /tags menu. This tag has your company name as the tag."}, new CompanyPerkAction("Reclaim Tag", Material.CARROT_ON_A_STICK, Role.Employee,
         "Reclaims company tag if somehow you don't have it") {
