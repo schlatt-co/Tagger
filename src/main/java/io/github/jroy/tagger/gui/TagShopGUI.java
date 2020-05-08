@@ -2,7 +2,6 @@ package io.github.jroy.tagger.gui;
 
 import dev.tycho.stonks.api.StonksAPI;
 import dev.tycho.stonks.api.StonksAPIException;
-import dev.tycho.stonks.managers.Repo;
 import dev.tycho.stonks.model.core.Account;
 import dev.tycho.stonks.model.core.Company;
 import fr.minuskube.inv.ClickableItem;
@@ -76,7 +75,12 @@ public class TagShopGUI implements InventoryProvider {
                   e.printStackTrace();
                   return;
                 }
-                Repo.getInstance().payAccount(player.getUniqueId(), "Purchase of \"" + tag.getName() + "\" tag", account, tag.getPrice());
+                try {
+                  StonksAPI.payAccount(account, player.getUniqueId(), tag.getPrice(), "Purchase of \"" + tag.getName() + "\" tag");
+                } catch (StonksAPIException e) {
+                  player.sendMessage(Utils.format(ChatColor.RED + "Error while collecting payment!"));
+                  e.printStackTrace();
+                }
               }
               try {
                 databaseManager.awardTag(player.getUniqueId(), tag);
